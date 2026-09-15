@@ -1,1 +1,37 @@
-[]
+[
+    {
+        "name": "아이스 카페라떼",
+        "img": "https://www.baristapaulbassett.co.kr/upload/menu/Espresso/I_CaffeLatte.jpg",
+        "cal": "150 kcal",
+        "sugar": "10g",
+        "caffeine": "150mg"
+    },
+    {
+        "name": "아이스 룽고",
+        "img": "https://www.baristapaulbassett.co.kr/upload/menu/Espresso/I_Lungo.jpg",
+        "cal": "10 kcal",
+        "sugar": "0g",
+        "caffeine": "160mg"
+    },
+    {
+        "name": "아이스 바닐라라떼",
+        "img": "https://www.baristapaulbassett.co.kr/upload/menu/Espresso/I_VanillaLatte.jpg",
+        "cal": "220 kcal",
+        "sugar": "25g",
+        "caffeine": "150mg"
+    },
+    {
+        "name": "밀크 아이스크림",
+        "img": "https://www.baristapaulbassett.co.kr/upload/menu/IceCream/MilkIceCream.jpg",
+        "cal": "190 kcal",
+        "sugar": "18g",
+        "caffeine": "0mg"
+    },
+    {
+        "name": "스패니쉬 크림 콜드브루",
+        "img": "https://www.baristapaulbassett.co.kr/upload/menu/ColdBrew/I_SpanishCreamColdBrew.jpg",
+        "cal": "170 kcal",
+        "sugar": "15g",
+        "caffeine": "180mg"
+    }
+]

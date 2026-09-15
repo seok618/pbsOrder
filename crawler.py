@@ -2,15 +2,19 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
+import urllib3 # 경고 숨기기용 추가
+
+# SSL 인증서 경고 숨기기
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def scrape_paul_bassett():
     url = "https://www.baristapaulbassett.co.kr/menu/List.pb?cid1=A"
-    # 봇 차단을 피하기 위해 User-Agent 정보를 구체적으로 작성합니다.
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
     
-    response = requests.get(url, headers=headers)
+    # [가장 중요한 수정] verify=False 옵션 추가!
+    response = requests.get(url, headers=headers, verify=False)
     soup = BeautifulSoup(response.text, 'html.parser')
     
     menu_list = []

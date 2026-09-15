@@ -2,31 +2,48 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
-import urllib3 # 경고 숨기기용 추가
+import urllib3 
 
-# SSL 인증서 경고 숨기기
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def scrape_paul_bassett():
     url = "https://www.baristapaulbassett.co.kr/menu/List.pb?cid1=A"
+    
+    # [핵심 1] 진짜 사람처럼 보이는 완벽한 헤더 위장 세트
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1'
     }
     
-    # [가장 중요한 수정] verify=False 옵션 추가!
-    response = requests.get(url, headers=headers, verify=False)
+    # [핵심 2] 세션을 만들어서 쿠키를 유지하며 접근!
+    with requests.Session() as s:
+        # 방화벽이 민감한 사이트는 메인 홈페이지를 먼저 한 번 찔러서 쿠키를 받은 뒤 접근하면 훨씬 잘 뚫립니다.
+        s.get("https://www.baristapaulbassett.co.kr", headers=headers, verify=False)
+        
+        # 진짜 타겟 URL로 접속
+        response = s.get(url, headers=headers, verify=False)
+        
+    # 만약 차단당했다면 200이 아닌 403(Forbidden) 류가 뜰 것입니다. 액션스 로그 확인용.
+    print(f"응답 코드 확인: {response.status_code}") 
+    
     soup = BeautifulSoup(response.text, 'html.parser')
     
     menu_list = []
     
-    # [핵심 수정] 폴바셋 홈페이지의 실제 메뉴 목록 구조입니다.
-    # .list_menu라는 클래스 하위에 있는 모든 li 태그를 찾습니다.
+    # 폴바셋 실제 메뉴 구조 (이전과 동일)
     items = soup.select('.list_menu > ul > li')
+    print(f"찾아낸 메뉴 개수: {len(items)}") 
     
-    print(f"총 {len(items)}개의 메뉴를 찾았습니다.") # 터미널 확인용
-    
-    # 5개만 가져오던 제한을 풀고 전체(에스프레소 카테고리)를 가져옵니다.
-    for item in items: 
+    # ... (아래 for 문부터 데이터 추출, json 저장 로직은 기존 코드와 100% 동일하게 유지해 주세요!) ...
+    for item in items:
         try:
             # 메뉴 이름 추출 (.txtArea 하위의 p 태그)
             name_tag = item.select_one('.txtArea > p')

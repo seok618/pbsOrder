@@ -8,31 +8,35 @@
         "dtls":"스페셜티 커피로 만든 큐브 얼음을 사용해 처음부터 끝까지 부드럽고 깔끔한 풍미를 즐길 수 있는 커피큐브 아메리카노"
     },
     {
-        "name": "아이스 룽고",
-        "img": "https://www.baristapaulbassett.co.kr/upload/menu/Espresso/I_Lungo.jpg",
-        "cal": "10 kcal",
-        "sugar": "0g",
-        "caffeine": "160mg"
+        "name": "카페 소이 밀크 with 허니",
+        "img": "https://www.baristapaulbassett.co.kr/upload/product/A/thumbnail_1_202609091059526171.jpg",
+        "cal": "220 kcal",
+        "sugar": "19g",
+        "caffeine": "206mg",
+        "dtls":"매일 두유의 고소한 풍미에 꿀의 든든한 단맛으로 완성한 카페 소이 밀크"
     },
     {
-        "name": "아이스 바닐라라떼",
-        "img": "https://www.baristapaulbassett.co.kr/upload/menu/Espresso/I_VanillaLatte.jpg",
-        "cal": "220 kcal",
-        "sugar": "25g",
-        "caffeine": "150mg"
+        "name": "아이스 카페 소이 밀크 with 허니",
+        "img": "https://www.baristapaulbassett.co.kr/upload/product/A/thumbnail_1_202609091059298971.jpg",
+        "cal": "160 kcal",
+        "sugar": "16g",
+        "caffeine": "212mg",
+        "dtls":"매일 두유의 고소한 풍미에 꿀의 든든한 단맛으로 완성한 카페 소이 밀크"        
     },
     {
         "name": "밀크 아이스크림",
         "img": "https://www.baristapaulbassett.co.kr/upload/menu/IceCream/MilkIceCream.jpg",
         "cal": "190 kcal",
         "sugar": "18g",
-        "caffeine": "0mg"
+        "caffeine": "0mg",
+        "dtls":"스페셜티 커피로 만든 큐브 얼음을 사용해 처음부터 끝까지 부드럽고 깔끔한 풍미를 즐길 수 있는 커피큐브 아메리카노"
     },
     {
         "name": "스패니쉬 크림 콜드브루",
         "img": "https://www.baristapaulbassett.co.kr/upload/menu/ColdBrew/I_SpanishCreamColdBrew.jpg",
         "cal": "170 kcal",
         "sugar": "15g",
-        "caffeine": "180mg"
+        "caffeine": "180mg",
+        "dtls":"스페셜티 커피로 만든 큐브 얼음을 사용해 처음부터 끝까지 부드럽고 깔끔한 풍미를 즐길 수 있는 커피큐브 아메리카노"
     }
 ]

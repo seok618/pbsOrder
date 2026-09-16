@@ -18,7 +18,7 @@
         .view-section.active { display: block; }
 
         /* ================= [화면 1: 메뉴판 디자인] ================= */
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding-top: 150px; padding-bottom: 20px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; padding-top: 150px; padding-bottom: 20px; }
         .menu-item { background: white; padding: 15px 10px; border-radius: 8px; text-align: center; cursor: pointer; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 2px solid transparent; transition: all 0.2s ease; }
         .menu-item:hover { border-color: #cc0000; transform: translateY(-3px); }
         .menu-item.selected { background-color: #fff0f0; border-color: #cc0000; }
@@ -154,7 +154,7 @@
                         <div class="nutrition-info">
                             칼로리: ${menu.cal}<br>
                             당류: ${menu.sugar}<br>
-                            카페인: ${menu.caffeine}
+                            카페인: ${menu.caffeine}<br>
                             설명: ${menu.dtls}
                         </div>
                     `;

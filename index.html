@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>폴바셋 주문 취합</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f0f0f0; }
+        
+        /* 탭 네비게이션 */
+        .tab-menu { display: flex; background-color: #ffffff; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 100; }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: none; font-size: 16px; cursor: pointer; color: #555; }
+        .tab-btn.active { font-weight: bold; color: #cc0000; border-bottom: 3px solid #cc0000; }
+        
+        /* 화면 컨테이너 */
+        .content-area { padding: 20px; max-width: 800px; margin: auto; }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* ================= [화면 1: 메뉴판 디자인] ================= */
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding-bottom: 20px; }
+        .menu-item { background: white; padding: 15px 10px; border-radius: 8px; text-align: center; cursor: pointer; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 2px solid transparent; transition: all 0.2s ease; }
+        .menu-item:hover { border-color: #cc0000; transform: translateY(-3px); }
+        .menu-item.selected { background-color: #fff0f0; border-color: #cc0000; }
+        
+        /* 둥근 메뉴 이미지 */
+        .menu-img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; }
+        
+        /* 영양정보 말풍선 */
+        .nutrition-info { display: none; position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 6px; font-size: 12px; white-space: nowrap; z-index: 10; pointer-events: none; }
+        .menu-item:hover .nutrition-info { display: block; }
+
+        /* 하단 가로형 고정 주문 폼 (폴드 화면에서 스크롤 안생기게 자동 줄바꿈) */
+        .horizontal-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); position: sticky; bottom: 0; z-index: 50; }
+        .horizontal-form > div { flex: 1; min-width: 120px; }
+        .horizontal-form label { margin-top: 0; margin-bottom: 5px; display: block; font-weight: bold; font-size: 13px; }
+        .horizontal-form input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .horizontal-form button.submit-btn { margin-top: 0; height: 40px; padding: 0 20px; flex-shrink: 0; background-color: #cc0000; color: white; border: none; font-weight: bold; border-radius: 4px; cursor: pointer; min-width: 100px; }
+        .horizontal-form button.submit-btn:hover { background-color: #a30000; }
+        .horizontal-form button.submit-btn:disabled { background-color: #999; cursor: not-allowed; }
+
+        /* ================= [화면 2: 주문 내역 카드 디자인] ================= */
+        .order-card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .order-name { font-weight: bold; font-size: 16px; color: #333; }
+        .order-menu { color: #cc0000; font-size: 15px; font-weight: bold; }
+        .order-note { color: #888; font-size: 13px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <!-- 상단 탭 네비게이션 -->
+    <div class="tab-menu">
+        <button class="tab-btn active" onclick="document.getElementById('menuTrigger').click()">1. 메뉴 고르기</button>
+        <button class="tab-btn" onclick="document.getElementById('historyTrigger').click()">2. 주문 내역</button>
+    </div>
+
+    <!-- 전체 화면 영역 -->
+    <div class="content-area">
+        
+        <!-- [화면 1] 메뉴 고르기 -->
+        <div id="menuView" class="view-section active">
+            <!-- 외부 menu.json을 읽어와서 그려줄 메뉴판 영역 -->
+            <div id="menuListArea" class="menu-grid">
+                <p style="text-align:center; width:100%; color:#888;">메뉴 데이터를 불러오는 중입니다...</p>
+            </div>
+
+            <!-- 하단 고정 주문 폼 -->
+            <form id="orderForm" class="horizontal-form">
+                <div>
+                    <label for="orderDate">주문 일자</label>
+                    <input type="date" id="orderDate" name="orderDate" readonly style="background-color: #f5f5f5; color: #555;">
+                </div>
+                <div>
+                    <label for="menuName">선택한 메뉴</label>
+                    <input type="text" id="menuName" name="menuName" required readonly placeholder="메뉴를 클릭하세요" style="background-color: #f5f5f5; color: #cc0000; font-weight: bold;">
+                </div>
+                <div>
+                    <label for="ordererName">주문자 이름</label>
+                    <input type="text" id="ordererName" name="ordererName" required placeholder="예: 강승석">
+                </div>
+                <div style="flex: 2; min-width: 150px;">
+                    <label for="requestNote">요청 사항 (선택)</label>
+                    <input type="text" id="requestNote" name="requestNote" placeholder="예: 얼음 적게">
+                </div>
+                <button type="submit" class="submit-btn">주문 전송</button>
+            </form>
+        </div>
+
+        <!-- [화면 2] 주문 내역 확인 -->
+        <div id="historyView" class="view-section">
+            <div style="margin-bottom: 20px; display: flex; align-items: center;">
+                <input type="date" id="searchDate" style="padding: 10px; flex: 1; font-weight: bold; text-align: center; font-size: 16px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div id="cardListArea">
+                <p style="text-align:center; color:#888;">날짜를 선택하면 내역이 표시됩니다.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 탭 전환용 숨김 버튼 -->
+    <button id="menuTrigger" style="display:none;"></button>
+    <button id="historyTrigger" style="display:none;"></button>
+
+    <!-- 파이어베이스 SDK 및 로직 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // ★강승석님의 파이어베이스 설정값으로 교체해주세요!★
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6ZkN48q__StAX3n3oSr4vQJhuBAQvEfo",
+            authDomain: "pbsorder-5e3ed.firebaseapp.com",
+            projectId: "pbsorder-5e3ed",
+            storageBucket: "pbsorder-5e3ed.firebasestorage.app",
+            messagingSenderId: "705163342825",
+            appId: "1:705163342825:web:140246d88c0daf2b055178"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 오늘 날짜 셋팅
+        const today = new Date();
+        document.getElementById('orderDate').valueAsDate = today;
+        document.getElementById('searchDate').valueAsDate = today;
+
+        // -----------------------------------------------------------
+        // 1. 외부 menu.json 파일 불러와서 메뉴 리스트 그리기
+        // -----------------------------------------------------------
+        async function fetchAndRenderMenus() {
+            const menuListArea = document.getElementById('menuListArea');
+            
+            try {
+                // 같은 폴더에 있는 menu.json 파일을 가져옵니다.
+                const response = await fetch('./menu.json');
+                if (!response.ok) throw new Error('menu.json 파일을 찾을 수 없습니다.');
+                
+                const paulBassettMenus = await response.json();
+                menuListArea.innerHTML = ''; // 로딩 텍스트 제거
+                
+                paulBassettMenus.forEach(menu => {
+                    const menuItem = document.createElement('div');
+                    menuItem.className = 'menu-item';
+                    
+                    // 이미지 URL이 비어있을 경우 대비 (기본 이미지 대체 가능)
+                    const imgSrc = menu.img ? menu.img : 'https://via.placeholder.com/100?text=No+Image';
+
+                    menuItem.innerHTML = `
+                        <img src="${imgSrc}" alt="${menu.name}" class="menu-img">
+                        <div style="font-weight: bold; font-size: 14px;">${menu.name}</div>
+                        
+                        <div class="nutrition-info">
+                            칼로리: ${menu.cal}<br>
+                            당류: ${menu.sugar}<br>
+                            카페인: ${menu.caffeine}
+                        </div>
+                    `;
+                    
+                    menuItem.addEventListener('click', function() {
+                        document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('selected'));
+                        this.classList.add('selected');
+                        document.getElementById('menuName').value = menu.name;
+                    });
+                    
+                    menuListArea.appendChild(menuItem);
+                });
+            } catch (error) {
+                console.error("메뉴 데이터 로딩 실패: ", error);
+                menuListArea.innerHTML = '<p style="color:red; text-align:center;">메뉴 정보를 불러오지 못했습니다.<br>menu.json 파일이 있는지 확인해주세요.</p>';
+            }
+        }
+
+        // 스크립트 실행 시 즉시 메뉴 불러오기
+        fetchAndRenderMenus();
+
+        // -----------------------------------------------------------
+        // 2. 탭 전환 로직
+        // -----------------------------------------------------------
+        function switchTab(viewId, btnIndex) {
+            document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(viewId).classList.add('active');
+            document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
+            
+            if (viewId === 'historyView') fetchOrderHistory();
+        }
+
+        document.getElementById('menuTrigger').addEventListener('click', () => switchTab('menuView', 0));
+        document.getElementById('historyTrigger').addEventListener('click', () => switchTab('historyView', 1));
+        document.getElementById('searchDate').addEventListener('change', fetchOrderHistory);
+
+        // -----------------------------------------------------------
+        // 3. 파이어베이스 주문 내역 조회 (GET)
+        // -----------------------------------------------------------
+        async function fetchOrderHistory() {
+            const selectedDate = document.getElementById('searchDate').value;
+            const listArea = document.getElementById('cardListArea');
+            if(!selectedDate) return;
+
+            listArea.innerHTML = '<p style="text-align:center; color:#888;">데이터를 불러오는 중...</p>';
+            try {
+                const q = query(collection(db, "orders"), where("orderDate", "==", selectedDate));
+                const querySnapshot = await getDocs(q);
+                const orderList = [];
+                querySnapshot.forEach((doc) => orderList.push(doc.data()));
+
+                listArea.innerHTML = ''; 
+                if (orderList.length === 0) {
+                    listArea.innerHTML = '<p style="text-align:center; color:#888;">이 날짜에는 주문 내역이 없습니다.</p>';
+                    return;
+                }
+                orderList.forEach(order => {
+                    const cardHtml = `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <span class="order-name">${order.ordererName}</span>
+                            </div>
+                            <div class="order-menu">${order.menuName}</div>
+                            ${order.requestNote ? `<div class="order-note">요청: ${order.requestNote}</div>` : ''}
+                        </div>
+                    `;
+                    listArea.innerHTML += cardHtml;
+                });
+            } catch (error) {
+                console.error("조회 실패:", error);
+                listArea.innerHTML = '<p style="color:red; text-align:center;">오류가 발생했습니다.</p>';
+            }
+        }
+
+        // -----------------------------------------------------------
+        // 4. 파이어베이스 주문 전송 (POST) 및 탭 자동 이동
+        // -----------------------------------------------------------
+        const form = document.getElementById('orderForm');
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+            
+            const menuName = document.getElementById('menuName').value;
+            if(!menuName) {
+                alert("상단에서 메뉴를 먼저 클릭해주세요!");
+                return;
+            }
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "전송 중...";
+
+            try {
+                await addDoc(collection(db, "orders"), {
+                    ordererName: document.getElementById('ordererName').value,
+                    menuName: menuName,
+                    orderDate: document.getElementById('orderDate').value,
+                    requestNote: document.getElementById('requestNote').value
+                });
+                
+                alert('주문이 빛의 속도로 접수되었습니다! ⚡');
+                
+                // 입력 폼 비우기 & 메뉴 선택 테두리 초기화
+                document.getElementById('ordererName').value = '';
+                document.getElementById('requestNote').value = '';
+                document.getElementById('menuName').value = '';
+                document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('selected'));
+                
+                // 전송 성공 시 주문 내역 탭으로 자동 이동 (강승석님 요청 기능)
+                document.getElementById('historyTrigger').click();
+                
+            } catch (error) {
+                console.error("저장 실패:", error);
+                alert("접수 중 오류가 발생했습니다.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "주문 전송";
+            }
+        });
+    </script>
+</body>
+</html>

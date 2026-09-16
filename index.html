@@ -13,18 +13,18 @@
         .tab-btn.active { font-weight: bold; color: #cc0000; border-bottom: 3px solid #cc0000; }
         
         /* 화면 컨테이너 */
-        .content-area { padding: 20px; max-width: 1600px; margin: auto; }
+        .content-area { padding: 20px; max-width: 800px; margin: auto; }
         .view-section { display: none; }
         .view-section.active { display: block; }
 
         /* ================= [화면 1: 메뉴판 디자인] ================= */
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; padding-top: 150px; padding-bottom: 20px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding-top: 150px; padding-bottom: 20px; }
         .menu-item { background: white; padding: 15px 10px; border-radius: 8px; text-align: center; cursor: pointer; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 2px solid transparent; transition: all 0.2s ease; }
         .menu-item:hover { border-color: #cc0000; transform: translateY(-3px); }
         .menu-item.selected { background-color: #fff0f0; border-color: #cc0000; }
         
         /* 둥근 메뉴 이미지 */
-        .menu-img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; }
+        .menu-img { width: 200px; height: 200px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; }
         
         /* 영양정보 말풍선 */
         .nutrition-info { display: none; position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 6px; font-size: 12px; white-space: nowrap; z-index: 10; pointer-events: none; }
